@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Attendance Dashboard{% endblock %}
+
+{% block content %}
+
+<h2 class="text-center mb-4">📊 Student Attendance Dashboard</h2>
+
+<!-- Filter Form -->
+<form method="get" class="row g-3 mb-3">
+    <div class="col-auto">
+        <label for="start_date" class="form-label">Start Date</label>
+        <input type="date" name="start_date" id="start_date" class="form-control"
+               value="{{ request.GET.start_date|default:today }}">
+    </div>
+    <div class="col-auto">
+        <label for="end_date" class="form-label">End Date</label>
+        <input type="date" name="end_date" id="end_date" class="form-control"
+               value="{{ request.GET.end_date|default:today }}">
+    </div>
+    <div class="col-auto align-self-end">
+        <button type="submit" class="btn btn-primary">Filter</button>
+        <a href="{% url 'attendance' %}" class="btn btn-secondary">Reset</a>
+    </div>
+    <div class="col-auto align-self-end">
+        <a href="{% url 'export_attendance_excel' %}" class="btn btn-success">⬇ Download Excel</a>
+    </div>
+</form>
+
+<!-- Period Stats Summary -->
+<div class="row mb-3">
+    {% for period, stats in period_stats.items %}
+        <div class="col-md-3 mb-2">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">{{ period|capfirst }}</h6>
+                    <p class="mb-1">Present: <strong>{{ stats.present }}</strong></p>
+                    <p class="mb-0">Absent: <strong>{{ stats.absent }}</strong></p>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Attendance Table -->
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Student Name</th>
+            <th>Image</th>
+            <th>Roll No</th>
+            <th>P1</th>
+            <th>P2</th>
+            <th>P3</th>
+            <th>P4</th>
+            <th>P5</th>
+            <th>P6</th>
+            <th>P7</th>
+            <th>Date</th>
+            <th>No. of Periods Present</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in records %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ record.student.student_name }}</td>
+            <td>
+                {% if record.student.student_image %}
+                    <img src="{{ record.student.student_image.url }}" alt="Photo" width="50" height="50">
+                {% else %}
+                    <img src="{% static 'default_photo.png' %}" alt="No Photo" width="50" height="50">
+                {% endif %}
+            </td>
+            <td>{{ record.student.student_rollno }}</td>
+
+            <!-- Period 1 -->
+            <td>
+                {% if record.period1 == "Present" %}
+                    <span class="badge bg-success">Present</span><br>
+                    <small style="font-size: 11px; color: #555;">{{ record.period1_time|time:"h:i A" }}</small>
+                {% else %}
+                    <span class="badge bg-danger">A</span>
+                {% endif %}
+            </td>
+
+            <!-- Period 2 -->
+            <td>
+                {% if record.period2 == "Present" %}
+                    <span class="badge bg-success">Present</span><br>
+                    <small style="font-size: 11px; color: #555;">{{ record.period2_time|time:"h:i A" }}</small>
+                {% else %}
+                    <span class="badge bg-danger">A</span>
+                {% endif %}
+            </td>
+
+            <!-- Period 3 -->
+            <td>
+                {% if record.period3 == "Present" %}
+                    <span class="badge bg-success">Present</span><br>
+                    <small style="font-size: 11px; color: #555;">{{ record.period3_time|time:"h:i A" }}</small>
+                {% else %}
+                    <span class="badge bg-danger">A</span>
+                {% endif %}
+            </td>
+
+            <!-- Period 4 -->
+            <td>
+                {% if record.period4 == "Present" %}
+                    <span class="badge bg-success">Present</span><br>
+                    <small style="font-size: 11px; color: #555;">{{ record.period4_time|time:"h:i A" }}</small>
+                {% else %}
+                    <span class="badge bg-danger">A</span>
+                {% endif %}
+            </td>
+
+            <!-- Period 5 -->
+            <td>
+                {% if record.period5 == "Present" %}
+                    <span class="badge bg-success">Present</span><br>
+                    <small style="font-size: 11px; color: #555;">{{ record.period5_time|time:"h:i A" }}</small>
+                {% else %}
+                    <span class="badge bg-danger">A</span>
+                {% endif %}
+            </td>
+
+            <!-- Period 6 -->
+            <td>
+                {% if record.period6 == "Present" %}
+                    <span class="badge bg-success">Present</span><br>
+                    <small style="font-size: 11px; color: #555;">{{ record.period6_time|time:"h:i A" }}</small>
+                {% else %}
+                    <span class="badge bg-danger">A</span>
+                {% endif %}
+            </td>
+
+            <!-- Period 7 -->
+            <td>
+                {% if record.period7 == "Present" %}
+                    <span class="badge bg-success">Present</span><br>
+                    <small style="font-size: 11px; color: #555;">{{ record.period7_time|time:"h:i A" }}</small>
+                {% else %}
+                    <span class="badge bg-danger">A</span>
+                {% endif %}
+            </td>
+
+            <td>{{ record.date }}</td>
+            <td>{{ record.total_present }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="13" class="text-center">No Attendance Records Found</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

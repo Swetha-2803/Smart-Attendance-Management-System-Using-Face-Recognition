@@ -1,0 +1,453 @@
+{% extends 'base.html' %}
+{% load custom_tags %}
+
+{% block title %}Admin Dashboard - Smart Attendance Management{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-6">
+        <h2 class="fw-bold text-dark">
+            <i class="fa-solid fa-shield-halved text-primary me-2"></i>Admin Dashboard
+        </h2>
+        <p class="text-muted mb-0">System Overview and Master Reports</p>
+    </div>
+    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+        <a href="{% url 'export_attendance_excel' %}" class="btn btn-primary fw-bold rounded-pill shadow-sm">
+            <i class="fa-solid fa-cloud-arrow-down me-1"></i> Export Master Data
+        </a>
+    </div>
+</div>
+
+<!-- Daily Overview Cards -->
+<div class="row g-4 mb-4">
+    <!-- Student Stats -->
+    <div class="col-md-3">
+        <div class="card bg-white h-100 border-0 shadow-sm border-start border-5 border-primary">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase fw-bold mb-3">Student Attendance (Today)</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="display-6 fw-bold text-dark mb-0">{{ students_present }} <span class="fs-6 text-success"><i class="fa-solid fa-arrow-up"></i> Present</span></h2>
+                        <div class="text-danger small mt-1">{{ students_absent }} Absent</div>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-3">
+                        <i class="fa-solid fa-user-graduate fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Staff Stats -->
+    <div class="col-md-3">
+        <div class="card bg-white h-100 border-0 shadow-sm border-start border-5 border-success">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase fw-bold mb-3">Staff Attendance (Today)</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="display-6 fw-bold text-dark mb-0">{{ staff_present }} <span class="fs-6 text-success"><i class="fa-solid fa-arrow-up"></i> Present</span></h2>
+                        <div class="text-danger small mt-1">{{ staff_absent }} Absent</div>
+                    </div>
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle p-3">
+                        <i class="fa-solid fa-chalkboard-user fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OD Stats -->
+    <div class="col-md-3">
+        <div class="card bg-white h-100 border-0 shadow-sm border-start border-5 border-warning">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase fw-bold mb-3">OD Requests</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="display-6 fw-bold text-dark mb-0">{{ total_ods }} <span class="fs-6 text-warning">Total</span></h2>
+                        <div class="text-muted small mt-1">{{ pending_ods }} Pending Approval</div>
+                    </div>
+                    <div class="bg-warning bg-opacity-10 text-warning rounded-circle p-3">
+                        <i class="fa-solid fa-file-signature fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Stats -->
+    <div class="col-md-3">
+        <div class="card bg-white h-100 border-0 shadow-sm border-start border-5 border-info">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase fw-bold mb-3">Inst. Monthly Avg</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="display-6 fw-bold text-dark mb-0">{{ monthly_percent }}%</h2>
+                        <div class="text-muted small mt-1">Overall Attendance</div>
+                    </div>
+                    <div class="bg-info bg-opacity-10 text-info rounded-circle p-3">
+                        <i class="fa-solid fa-chart-pie fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <!-- Long Absentees List (Critical) -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-danger bg-opacity-10 text-danger border-0 d-flex justify-content-between align-items-center py-3">
+                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-triangle-exclamation me-2"></i>Long Absentees (< 75%)</h6>
+                <span class="badge bg-danger rounded-pill">{{ long_absentees|length }} Students</span>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for item in long_absentees %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                        <div>
+                            <div class="fw-bold text-dark">{{ item.student.student_name }}</div>
+                            <div class="small text-muted">{{ item.student.student_rollno }}</div>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-danger text-white rounded-pill px-2 py-1">{{ item.percent }}%</span>
+                            <div class="small text-danger fw-bold mt-1" style="font-size: 0.7rem;">Attendance Low</div>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-center py-5 text-muted">
+                        <i class="fa-solid fa-face-smile-beam fa-2x mb-2 text-success"></i>
+                        <p class="mb-0">All students have good attendance!</p>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Master Attendance View -->
+    <div class="col-lg-8">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 flex-wrap gap-2">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-list-check me-2 text-primary"></i>Daily Attendance Register</h5>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <input type="text" id="attendanceSearch" class="form-control form-control-sm" placeholder="Search Roll No..." style="max-width: 150px;">
+                    <form method="GET" class="d-flex align-items-center mb-0">
+                        <input type="date" class="form-control form-control-sm me-2" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+                        <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                    </form>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-download me-1"></i> Reports
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                            <li><h6 class="dropdown-header">Download Format</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'export_attendance_pdf' %}?date={{ selected_date|date:'Y-m-d' }}"><i class="fa-solid fa-file-pdf text-danger me-2"></i>PDF Document</a></li>
+                            <li><a class="dropdown-item" href="{% url 'export_attendance_excel' %}?date={{ selected_date|date:'Y-m-d' }}"><i class="fa-solid fa-file-excel text-success me-2"></i>Excel Spreadsheet</a></li>
+                            <li><a class="dropdown-item" href="{% url 'export_attendance_word' %}?date={{ selected_date|date:'Y-m-d' }}"><i class="fa-solid fa-file-word text-primary me-2"></i>Word Document</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'export_attendance_csv' %}?date={{ selected_date|date:'Y-m-d' }}"><i class="fa-solid fa-file-csv text-secondary me-2"></i>CSV File</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table table-hover align-middle mb-0" id="attendanceTable">
+                        <thead class="bg-light sticky-top">
+                            <tr>
+                                <th>Student Details</th>
+                                <th class="text-center">Overall %</th>
+                                <th class="text-center">P1</th>
+                                <th class="text-center">P2</th>
+                                <th class="text-center">P3</th>
+                                <th class="text-center">P4</th>
+                                <th class="text-center">P5</th>
+                                <th class="text-center">P6</th>
+                                <th class="text-center">P7</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in daily_records %}
+                            <tr class="attendance-row" data-roll="{{ item.record.student_rollno|lower }}">
+                                <td>
+                                    <div class="fw-bold text-dark">{{ item.record.student_name }}</div>
+                                    <div class="small text-muted">{{ item.record.student_rollno }}</div>
+                                </td>
+                                <td class="text-center fw-bold">
+                                    {% if item.percent > 75 %}
+                                        <span class="text-success">{{ item.percent }}%</span>
+                                    {% else %}
+                                        <span class="text-danger">{{ item.percent }}%</span>
+                                    {% endif %}
+                                </td>
+                                {% for period in periods %}
+                                    <td class="text-center">
+                                        {% with status=item.record|get_period_status:period time=item.record|get_period_time:period %}
+                                            {% if status == 'Present' %}
+                                                <div class="d-flex flex-column align-items-center">
+                                                    <i class="fa-solid fa-circle-check text-success"></i>
+                                                    {% if time %}
+                                                        <small class="text-muted fw-bold mt-1" style="font-size: 0.65rem;">{{ time|time:"h:i A" }}</small>
+                                                    {% endif %}
+                                                </div>
+                                            {% elif status == 'OD' %}
+                                                <div class="d-flex flex-column align-items-center">
+                                                    <i class="fa-solid fa-circle-user text-info"></i>
+                                                </div>
+                                            {% else %}
+                                                <div class="d-flex flex-column align-items-center">
+                                                    <i class="fa-solid fa-circle-xmark text-danger"></i>
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
+                                    </td>
+                                {% endfor %}
+                                <td class="text-center">
+                                    {% if item.percent > 75 %}
+                                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill" style="font-size: 0.7rem;">Leave Eligible</span>
+                                    {% else %}
+                                        <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill" style="font-size: 0.7rem;">Low Attendance</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="10" class="text-center py-5 text-muted">
+                                    <i class="fa-solid fa-calendar-xmark fa-2x mb-2"></i>
+                                    <p class="mb-0">No attendance data found for this date.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <!-- Pending Student OD Requests -->
+    <div class="col-lg-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-file-signature me-2 text-warning"></i>Pending Student ODs</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Student</th>
+                                <th>Date</th>
+                                <th>Reason</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for od in pending_ods %}
+                            <tr>
+                                <td>
+                                    <div class="fw-bold text-dark">{{ od.student.student_name }}</div>
+                                    <div class="small text-muted">{{ od.student.student_rollno }}</div>
+                                    {% if od.document %}
+                                    <a href="{{ od.document.url }}" target="_blank" class="badge bg-info text-decoration-none mt-1"><i class="fa-solid fa-paperclip me-1"></i>Doc</a>
+                                    {% endif %}
+                                </td>
+                                <td><span class="badge bg-light text-dark border">{{ od.date|date:"d M Y" }}</span></td>
+                                <td><small class="text-muted d-inline-block text-truncate" style="max-width: 150px;" title="{{ od.reason }}">{{ od.reason }}</small></td>
+                                <td class="text-end">
+                                    <form method="post" action="{% url 'approve_od' od.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="approve">
+                                        <button type="submit" class="btn btn-sm btn-success rounded-circle" title="Approve"><i class="fa-solid fa-check"></i></button>
+                                    </form>
+                                    <form method="post" action="{% url 'approve_od' od.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="reject">
+                                        <button type="submit" class="btn btn-sm btn-danger rounded-circle" title="Reject"><i class="fa-solid fa-xmark"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">No pending OD requests.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Staff Leave Permissions -->
+    <div class="col-lg-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-person-walking-arrow-right me-2 text-danger"></i>Pending Staff Leaves</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Staff Details</th>
+                                <th>Date</th>
+                                <th>Reason</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for leave in pending_staff_leaves %}
+                            <tr>
+                                <td>
+                                    <div class="fw-bold text-dark">{{ leave.staff.user.first_name }} {{ leave.staff.user.last_name }}</div>
+                                    <div class="small text-muted">{{ leave.staff.staff_id }}</div>
+                                    {% if leave.document %}
+                                    <a href="{{ leave.document.url }}" target="_blank" class="badge bg-danger text-decoration-none mt-1"><i class="fa-solid fa-paperclip me-1"></i>Doc</a>
+                                    {% endif %}
+                                </td>
+                                <td><span class="badge bg-light text-dark border">{{ leave.date|date:"d M Y" }}</span></td>
+                                <td><small class="text-muted d-inline-block text-truncate" style="max-width: 150px;" title="{{ leave.reason }}">{{ leave.reason }}</small></td>
+                                <td class="text-end">
+                                    <form method="post" action="{% url 'approve_staff_leave' leave.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="approve">
+                                        <button type="submit" class="btn btn-sm btn-success rounded-circle" title="Approve"><i class="fa-solid fa-check"></i></button>
+                                    </form>
+                                    <form method="post" action="{% url 'approve_staff_leave' leave.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="reject">
+                                        <button type="submit" class="btn btn-sm btn-danger rounded-circle" title="Reject"><i class="fa-solid fa-xmark"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">No pending staff leave requests.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Pending Student Leave Permissions -->
+    <div class="col-lg-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-envelope-open-text me-2 text-primary"></i>Pending Student Leaves</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Student Details</th>
+                                <th>Date</th>
+                                <th>Reason</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for leave in pending_student_leaves %}
+                            <tr>
+                                <td>
+                                    <div class="fw-bold text-dark">{{ leave.student.student_name }}</div>
+                                    <div class="small text-muted">{{ leave.student.student_rollno }}</div>
+                                    {% if leave.document %}
+                                    <a href="{{ leave.document.url }}" target="_blank" class="badge bg-primary text-decoration-none mt-1"><i class="fa-solid fa-paperclip me-1"></i>Doc</a>
+                                    {% endif %}
+                                </td>
+                                <td><span class="badge bg-light text-dark border">{{ leave.date|date:"d M Y" }}</span></td>
+                                <td><small class="text-muted d-inline-block text-truncate" style="max-width: 150px;" title="{{ leave.reason }}">{{ leave.reason }}</small></td>
+                                <td class="text-end">
+                                    <form method="post" action="{% url 'approve_student_leave' leave.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="approve">
+                                        <button type="submit" class="btn btn-sm btn-success rounded-circle" title="Approve"><i class="fa-solid fa-check"></i></button>
+                                    </form>
+                                    <form method="post" action="{% url 'approve_student_leave' leave.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="reject">
+                                        <button type="submit" class="btn btn-sm btn-danger rounded-circle" title="Reject"><i class="fa-solid fa-xmark"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">No pending student leave requests.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<style>
+    .card {
+        border-radius: 15px;
+        transition: transform 0.2s ease-in-out;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    .sticky-top {
+        z-index: 1;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('attendanceSearch');
+        
+        function applySearchFilter() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const tableRows = document.querySelectorAll('#attendanceTable .attendance-row');
+            tableRows.forEach(row => {
+                const rollNo = row.getAttribute('data-roll');
+                if (rollNo && rollNo.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        searchInput.addEventListener('keyup', applySearchFilter);
+
+        // Live Dashboard Auto-Refresh (Every 3 seconds)
+        setInterval(() => {
+            fetch(window.location.href)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    
+                    // Update Table
+                    const newTable = doc.getElementById('attendanceTable');
+                    const oldTable = document.getElementById('attendanceTable');
+                    if (newTable && oldTable) {
+                        oldTable.innerHTML = newTable.innerHTML;
+                        applySearchFilter(); // Reapply search after HTML swap
+                    }
+                    
+                    // Update Top Stats (if needed, finding them by matching their structure)
+                    // For now, keeping the table live is the most important for attendance
+                })
+                .catch(err => console.log('Live update error:', err));
+        }, 3000);
+    });
+</script>
+{% endblock %}

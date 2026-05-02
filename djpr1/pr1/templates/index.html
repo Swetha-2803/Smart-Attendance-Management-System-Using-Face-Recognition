@@ -1,0 +1,480 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Welcome - Smart Attendance Management{% endblock %}
+
+{% block extra_css %}
+<!-- AOS CSS -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<style>
+    /* Unique animated gradient background for the hero */
+    .hero-gradient {
+        background: linear-gradient(-45deg, #fdfbfb, #ebedee, #e0f7fa, #e3f2fd);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+    }
+    @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    /* Pulse effect for workflow steps */
+    .step-icon {
+        position: relative;
+    }
+    .step-icon::before {
+        content: '';
+        position: absolute;
+        top: -10px; left: -10px; right: -10px; bottom: -10px;
+        border-radius: 50%;
+        border: 2px solid inherit;
+        opacity: 0;
+        animation: pulse 2s linear infinite;
+    }
+    .step-icon-primary::before { border-color: #0d6efd; }
+    .step-icon-success::before { border-color: #198754; }
+    .step-icon-info::before { border-color: #0dcaf0; }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.5; }
+        100% { transform: scale(1.3); opacity: 0; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section py-5 mb-5 position-relative overflow-hidden hero-gradient">
+    <div class="container py-5 z-1 position-relative">
+        <div class="row align-items-center">
+            <div class="col-lg-6 text-center text-lg-start mb-5 mb-lg-0" data-aos="fade-right" data-aos-duration="1000">
+                <div class="badge bg-primary text-white rounded-pill px-3 py-2 mb-3 shadow-sm"
+                    style="background: linear-gradient(to right, #00c6ff, #0072ff) !important;">AI-Powered Accuracy
+                </div>
+                <h1 class="display-4 fw-bolder text-dark mb-3" style="letter-spacing: -1px;">Next-Gen <span
+                        style="background: -webkit-linear-gradient(45deg, #0d6efd, #0dcaf0); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Smart
+                        Attendance</span> Management</h1>
+                <p class="lead text-muted mb-4 pe-lg-4">
+                    Seamlessly track attendance using AI-powered face recognition. Dual-camera technology, instant
+                    period-wise tracking, and automated OD workflows.
+                </p>
+                <div class="d-flex justify-content-center justify-content-lg-start gap-3">
+                    <a href="#portals"
+                        class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow hover-transform"
+                        style="background: linear-gradient(45deg, #0d6efd, #0099ff); border: none;">Get Started <i
+                            class="fa-solid fa-arrow-down ms-2"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center" data-aos="fade-left" data-aos-duration="1200" data-aos-delay="200">
+                <div class="position-relative d-inline-block">
+                    <!-- Colorful decorative blobs behind the image -->
+                    <div class="position-absolute rounded-circle"
+                        style="width: 350px; height: 350px; background: linear-gradient(45deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); filter: blur(50px); opacity: 0.6; top: 40%; left: 30%; transform: translate(-50%, -50%); z-index: -1;">
+                    </div>
+                    <div class="position-absolute rounded-circle"
+                        style="width: 300px; height: 300px; background: linear-gradient(to top, #0ba360 0%, #3cba92 100%); filter: blur(60px); opacity: 0.4; top: 60%; left: 70%; transform: translate(-50%, -50%); z-index: -1;">
+                    </div>
+
+                    <!-- Main Student Face Image -->
+                    <img src="{% static 'img/student_face.png' %}" alt="Student AI Face Scan"
+                        class="img-fluid floating-hero position-relative z-1"
+                        style="max-height: 480px; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.15));">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Decorative background elements -->
+<div class="position-absolute top-0 start-0 w-100 h-100 overflow-hidden z-0" style="pointer-events: none;">
+    <div class="bg-primary rounded-circle position-absolute"
+        style="width: 400px; height: 400px; opacity: 0.03; top: -100px; left: -100px; filter: blur(50px);"></div>
+    <div class="bg-info rounded-circle position-absolute"
+        style="width: 300px; height: 300px; opacity: 0.05; bottom: -50px; right: -50px; filter: blur(60px);"></div>
+</div>
+</div>
+
+<!-- Login Portals Section -->
+<section id="portals" class="py-5 bg-light rounded-5 shadow-sm mb-5" data-aos="fade-up" data-aos-duration="800">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="zoom-in" data-aos-duration="800">
+            <h2 class="fw-bold text-dark">Access Portals</h2>
+            <p class="text-muted">Select your role to login to the system</p>
+        </div>
+
+        <div class="row justify-content-center g-4">
+            <!-- Admin Portal -->
+            <div class="col-md-4">
+                <a href="{% url 'login' %}" class="text-decoration-none">
+                    <div class="card h-100 text-center border-0 shadow-sm hover-card portal-card card-admin bg-white">
+                        <div class="card-body p-5">
+                            <div class="icon-wrapper bg-primary bg-opacity-10 text-primary mx-auto mb-4">
+                                <i class="fa-solid fa-user-shield fa-3x"></i>
+                            </div>
+                            <h4 class="fw-bold text-dark mb-3">Admin Portal</h4>
+                            <p class="text-muted mb-4">Master control panel. Access institution-wide analytics,
+                                comprehensive reports, and staff management.</p>
+                            <span class="btn btn-primary w-100 rounded-pill fw-bold">Login as Admin</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Staff Portal -->
+            <div class="col-md-4">
+                <a href="{% url 'login' %}" class="text-decoration-none">
+                    <div class="card h-100 text-center border-0 shadow-sm hover-card portal-card card-staff bg-white">
+                        <div class="card-body p-5">
+                            <div class="icon-wrapper bg-success bg-opacity-10 text-success mx-auto mb-4">
+                                <i class="fa-solid fa-chalkboard-user fa-3x"></i>
+                            </div>
+                            <h4 class="fw-bold text-dark mb-3">Staff Portal</h4>
+                            <p class="text-muted mb-4">Classroom management. View period-wise attendance, register
+                                students, and approve OD requests.</p>
+                            <span class="btn btn-success w-100 rounded-pill fw-bold">Login as Staff</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Student Portal -->
+            <div class="col-md-4">
+                <a href="{% url 'login' %}" class="text-decoration-none">
+                    <div class="card h-100 text-center border-0 shadow-sm hover-card portal-card card-student bg-white">
+                        <div class="card-body p-5">
+                            <div class="icon-wrapper bg-info bg-opacity-10 text-info mx-auto mb-4">
+                                <i class="fa-solid fa-user-graduate fa-3x"></i>
+                            </div>
+                            <h4 class="fw-bold text-dark mb-3">Student Portal</h4>
+                            <p class="text-muted mb-4">Personal dashboard. Check daily & monthly attendance percentages
+                                and submit OD requests easily.</p>
+                            <span class="btn btn-info text-white w-100 rounded-pill fw-bold">Login as Student</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5 mb-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="fw-bold text-dark">System Features</h2>
+            <p class="text-muted">Why Smart Attendance Management is the ultimate solution</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3" data-aos="flip-left" data-aos-delay="100">
+                <div class="p-4 bg-white rounded-4 shadow-sm h-100 border-start border-4 border-primary">
+                    <i class="fa-solid fa-camera-retro fa-2x text-primary mb-3"></i>
+                    <h5 class="fw-bold">Dual-Camera Tracking</h5>
+                    <p class="text-muted small mb-0">Tracks entry and exit using inside & outside cameras with a
+                        10-minute grace period logic.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3" data-aos="flip-left" data-aos-delay="200">
+                <div class="p-4 bg-white rounded-4 shadow-sm h-100 border-start border-4 border-success">
+                    <i class="fa-solid fa-users-viewfinder fa-2x text-success mb-3"></i>
+                    <h5 class="fw-bold">Liveness Detection</h5>
+                    <p class="text-muted small mb-0">Advanced AI checks for eye-blinking and head movement to prevent
+                        spoofing.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3" data-aos="flip-left" data-aos-delay="300">
+                <div class="p-4 bg-white rounded-4 shadow-sm h-100 border-start border-4 border-info">
+                    <i class="fa-solid fa-clock-rotate-left fa-2x text-info mb-3"></i>
+                    <h5 class="fw-bold">Period-wise Tracking</h5>
+                    <p class="text-muted small mb-0">Granular attendance tracking for up to 7 periods a day, completely
+                        automated.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3" data-aos="flip-left" data-aos-delay="400">
+                <div class="p-4 bg-white rounded-4 shadow-sm h-100 border-start border-4 border-warning">
+                    <i class="fa-solid fa-file-signature fa-2x text-warning mb-3"></i>
+                    <h5 class="fw-bold">Automated OD Flow</h5>
+                    <p class="text-muted small mb-0">Students request OD directly, staff approves, and system updates
+                        attendance instantly.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- How It Works Section -->
+<section class="py-5 position-relative overflow-hidden"
+    style="background: linear-gradient(180deg, #ffffff 0%, #f4f7f6 100%);">
+    <div class="container py-5">
+        <div class="text-center mb-5" data-aos="zoom-in">
+            <div class="badge bg-success text-white rounded-pill px-3 py-2 mb-3 shadow-sm">Simple Workflow</div>
+            <h2 class="fw-bold text-dark mb-3">How It Works</h2>
+            <p class="text-muted mx-auto" style="max-width: 600px;">Experience a frictionless attendance process powered
+                by state-of-the-art computer vision technology.</p>
+        </div>
+
+        <div class="row position-relative z-1">
+            <!-- Step 1 -->
+            <div class="col-md-4 text-center mb-4 mb-md-0" data-aos="fade-up" data-aos-delay="100">
+                <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle shadow mb-4 step-icon step-icon-primary"
+                    style="width: 100px; height: 100px; border: 4px solid #0d6efd;">
+                    <i class="fa-solid fa-person-walking-arrow-right fa-3x text-primary"></i>
+                </div>
+                <h4 class="fw-bold">1. Walk In</h4>
+                <p class="text-muted px-3">Students walk through the door naturally. No ID cards or fingerprint scans
+                    needed.</p>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="col-md-4 text-center mb-4 mb-md-0" data-aos="fade-up" data-aos-delay="300">
+                <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle shadow mb-4 step-icon step-icon-success"
+                    style="width: 100px; height: 100px; border: 4px solid #198754;">
+                    <i class="fa-solid fa-expand fa-3x text-success"></i>
+                </div>
+                <h4 class="fw-bold">2. AI Scans Face</h4>
+                <p class="text-muted px-3">Dual cameras capture the face. Liveness detection ensures it's a real person,
+                    not a photo.</p>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="col-md-4 text-center" data-aos="fade-up" data-aos-delay="500">
+                <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle shadow mb-4 step-icon step-icon-info"
+                    style="width: 100px; height: 100px; border: 4px solid #0dcaf0;">
+                    <i class="fa-solid fa-server fa-3x text-info"></i>
+                </div>
+                <h4 class="fw-bold">3. Auto Update</h4>
+                <p class="text-muted px-3">Attendance is securely logged in the database instantly, visible in student
+                    and staff dashboards.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats / Impact Banner -->
+<section class="py-5" style="background: linear-gradient(135deg, #0d6efd, #00c6ff);" id="stats-section">
+    <div class="container py-4 text-center text-white">
+        <div class="row g-4">
+            <div class="col-6 col-md-3" data-aos="zoom-in" data-aos-delay="100">
+                <h2 class="display-5 fw-bold mb-0"><span class="counter" data-target="99">0</span>%</h2>
+                <p class="opacity-75 mb-0">Accuracy Rate</p>
+            </div>
+            <div class="col-6 col-md-3" data-aos="zoom-in" data-aos-delay="200">
+                <h2 class="display-5 fw-bold mb-0">&lt;<span class="counter" data-target="1">0</span>s</h2>
+                <p class="opacity-75 mb-0">Detection Time</p>
+            </div>
+            <div class="col-6 col-md-3" data-aos="zoom-in" data-aos-delay="300">
+                <h2 class="display-5 fw-bold mb-0"><span class="counter" data-target="24">0</span>/7</h2>
+                <p class="opacity-75 mb-0">Cloud Sync</p>
+            </div>
+            <div class="col-6 col-md-3" data-aos="zoom-in" data-aos-delay="400">
+                <h2 class="display-5 fw-bold mb-0"><span class="counter" data-target="100">0</span>%</h2>
+                <p class="opacity-75 mb-0">Proxy Proof</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Enhanced Footer -->
+<footer class="pt-5 pb-4 bg-dark text-white">
+    <div class="container">
+        <div class="row g-4 mb-4">
+            <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+                <h5 class="fw-bold mb-4"><i class="fa-solid fa-face-viewfinder me-2 text-primary"></i>Smart Attendance
+                </h5>
+                <p class="text-white-50">Revolutionizing classroom management with artificial intelligence. Say goodbye
+                    to manual roll calls and proxies.</p>
+                <div class="d-flex gap-3 mt-4">
+                    <a href="#" class="text-white-50 hover-white transition-all"><i
+                            class="fa-brands fa-facebook fa-lg"></i></a>
+                    <a href="#" class="text-white-50 hover-white transition-all"><i
+                            class="fa-brands fa-twitter fa-lg"></i></a>
+                    <a href="#" class="text-white-50 hover-white transition-all"><i
+                            class="fa-brands fa-linkedin fa-lg"></i></a>
+                    <a href="#" class="text-white-50 hover-white transition-all"><i
+                            class="fa-brands fa-github fa-lg"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+                <h6 class="text-uppercase fw-bold mb-4">Quick Links</h6>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-white">Home</a></li>
+                    <li class="mb-2"><a href="#portals" class="text-white-50 text-decoration-none hover-white">Login
+                            Portals</a></li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-white">Features</a>
+                    </li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-white">About Us</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                <h6 class="text-uppercase fw-bold mb-4">Support</h6>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-white">Help Center</a>
+                    </li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-white">Privacy
+                            Policy</a></li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-white">Terms of
+                            Service</a></li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-white">Contact
+                            Admin</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <h6 class="text-uppercase fw-bold mb-4">Contact Us</h6>
+                <ul class="list-unstyled mb-0 text-white-50">
+                    <li class="mb-3"><i class="fa-solid fa-location-dot me-3 text-primary"></i> 123 Tech Campus,
+                        Innovation Hub</li>
+                    <li class="mb-3"><i class="fa-solid fa-envelope me-3 text-primary"></i> support@smartattendance.pro
+                    </li>
+                    <li class="mb-3"><i class="fa-solid fa-phone me-3 text-primary"></i> +1 (800) 123-4567</li>
+                </ul>
+            </div>
+        </div>
+
+        <hr class="border-secondary mb-4">
+
+        <div class="text-center text-white-50">
+            <small>&copy; 2026 Smart Attendance Management System. All rights reserved.</small>
+        </div>
+    </div>
+</footer>
+
+<style>
+    .icon-wrapper {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.3s ease;
+    }
+
+    .portal-card {
+        border-radius: 20px;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 2px solid transparent !important;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    /* Stagger the animations slightly so they don't move exactly together */
+    .col-md-4:nth-child(1) .portal-card {
+        animation-delay: 0s;
+    }
+
+    .col-md-4:nth-child(2) .portal-card {
+        animation-delay: 1s;
+    }
+
+    .col-md-4:nth-child(3) .portal-card {
+        animation-delay: 2s;
+    }
+
+    @keyframes float {
+        0% {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-8px);
+        }
+
+        100% {
+            transform: translateY(0px);
+        }
+    }
+
+    .portal-card:hover {
+        transform: translateY(-15px) !important;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+        animation-play-state: paused;
+    }
+
+    /* Custom Border Colors on Hover */
+    .card-admin:hover {
+        border-color: #0d6efd !important;
+    }
+
+    .card-staff:hover {
+        border-color: #198754 !important;
+    }
+
+    .card-student:hover {
+        border-color: #0dcaf0 !important;
+    }
+
+    .portal-card:hover .icon-wrapper {
+        transform: scale(1.1);
+    }
+
+    .floating-hero {
+        animation: floatHero 8s ease-in-out infinite;
+    }
+
+    @keyframes floatHero {
+        0% {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-15px);
+        }
+
+        100% {
+            transform: translateY(0px);
+        }
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+</style>
+{% block extra_js %}
+<!-- AOS JS -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    // Initialize AOS animations
+    AOS.init({
+        once: true, // whether animation should happen only once - while scrolling down
+        offset: 100, // offset (in px) from the original trigger point
+    });
+
+    // Animate numbers for stats section
+    const counters = document.querySelectorAll('.counter');
+    let hasCounted = false;
+
+    const animateCounters = () => {
+        counters.forEach(counter => {
+            counter.innerText = '0';
+            const updateCounter = () => {
+                const target = +counter.getAttribute('data-target');
+                const c = +counter.innerText;
+                const increment = target / 50; // Adjust speed here
+
+                if (c < target) {
+                    counter.innerText = Math.ceil(c + increment);
+                    setTimeout(updateCounter, 30);
+                } else {
+                    counter.innerText = target;
+                }
+            };
+            updateCounter();
+        });
+    };
+
+    // Run animation when stats section is scrolled into view
+    const observer = new IntersectionObserver((entries) => {
+        if(entries[0].isIntersecting && !hasCounted) {
+            hasCounted = true;
+            animateCounters();
+        }
+    }, { threshold: 0.5 });
+    
+    const statsSection = document.getElementById('stats-section');
+    if (statsSection) {
+        observer.observe(statsSection);
+    }
+</script>
+{% endblock %}
+{% endblock %}

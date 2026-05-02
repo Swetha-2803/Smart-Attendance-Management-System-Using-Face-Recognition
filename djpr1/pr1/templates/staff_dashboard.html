@@ -1,0 +1,496 @@
+{% extends 'base.html' %}
+{% load custom_tags %}
+
+{% block title %}Staff Dashboard - Smart Attendance Pro{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-6">
+        <h2 class="fw-bold" style="color: var(--primary-blue);">
+            <i class="fa-solid fa-chalkboard-user me-2"></i>Staff Dashboard
+        </h2>
+        <p class="text-muted mb-0">Manage student attendance and OD requests</p>
+    </div>
+    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+        <a href="#enrollment-section" class="btn btn-outline-primary fw-bold rounded-pill shadow-sm me-2">
+            <i class="fa-solid fa-user-plus me-1"></i> Enroll/Edit
+        </a>
+        <a href="#" class="btn btn-primary fw-bold rounded-pill shadow-sm">
+            <i class="fa-solid fa-file-excel me-1"></i> Export Report
+        </a>
+    </div>
+</div>
+
+<!-- Stats Row -->
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card bg-primary text-white h-100 border-0" style="background: linear-gradient(135deg, #2196f3, #1976d2) !important;">
+            <div class="card-body">
+                <h6 class="text-white-50 text-uppercase fw-bold mb-3">Today's Class Average</h6>
+                <h2 class="display-5 fw-bold mb-0">{{ today_percent }}%</h2>
+                <p class="mb-0 mt-2"><i class="fa-solid fa-clock me-1"></i> Based on 7 periods</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-success text-white h-100 border-0" style="background: linear-gradient(135deg, #00b894, #00cec9) !important;">
+            <div class="card-body">
+                <h6 class="text-white-50 text-uppercase fw-bold mb-3">This Week Average</h6>
+                <h2 class="display-5 fw-bold mb-0">{{ week_percent }}%</h2>
+                <p class="mb-0 mt-2"><i class="fa-solid fa-calendar-week me-1"></i> Weekly average</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-info text-white h-100 border-0" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe) !important;">
+            <div class="card-body">
+                <h6 class="text-white-50 text-uppercase fw-bold mb-3">This Month Average</h6>
+                <h2 class="display-5 fw-bold mb-0">{{ month_percent }}%</h2>
+                <p class="mb-0 mt-2"><i class="fa-solid fa-calendar-days me-1"></i> Monthly average</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pending Requests -->
+<div class="row g-4 mb-5">
+    <!-- Pending OD Requests -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold text-warning"><i class="fa-solid fa-bell me-2"></i>Pending OD Requests</h5>
+                <span class="badge bg-warning text-dark rounded-pill">{{ pending_ods|length }} Pending</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for od in pending_ods %}
+                            <tr>
+                                <td class="fw-semibold">
+                                    <div class="text-dark">{{ od.student.student_name }}</div>
+                                    <div class="small text-muted">{{ od.student.student_rollno }}</div>
+                                </td>
+                                <td>{{ od.date|date:"M d, Y" }}</td>
+                                <td class="text-end">
+                                    <form method="post" action="{% url 'approve_od' od.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" name="action" value="approve" class="btn btn-sm btn-success rounded-pill px-3 me-1"><i class="fa-solid fa-check"></i></button>
+                                        <button type="submit" name="action" value="reject" class="btn btn-sm btn-danger rounded-pill px-3"><i class="fa-solid fa-xmark"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center py-4 text-muted">No pending OD requests.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Leave Requests -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold text-danger"><i class="fa-solid fa-envelope-open-text me-2"></i>Pending Leave Requests</h5>
+                <span class="badge bg-danger text-white rounded-pill">{{ pending_student_leaves|length }} Pending</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for leave in pending_student_leaves %}
+                            <tr>
+                                <td class="fw-semibold">
+                                    <div class="text-dark">{{ leave.student.student_name }}</div>
+                                    <div class="small text-muted">{{ leave.student.student_rollno }}</div>
+                                </td>
+                                <td>{{ leave.date|date:"M d, Y" }}</td>
+                                <td class="text-end">
+                                    <form method="post" action="{% url 'approve_student_leave' leave.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" name="action" value="approve" class="btn btn-sm btn-success rounded-pill px-3 me-1"><i class="fa-solid fa-check"></i></button>
+                                        <button type="submit" name="action" value="reject" class="btn btn-sm btn-danger rounded-pill px-3"><i class="fa-solid fa-xmark"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center py-4 text-muted">No pending Leave requests.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Panels: Enrollment and Manual Update -->
+<div class="row g-4 mb-5" id="enrollment-section">
+    <!-- User Enrollment Container -->
+    <div class="col-lg-6 d-flex align-items-stretch">
+        <div class="card border-0 shadow-sm w-100">
+            <div class="card-header bg-white d-flex align-items-center py-3 border-bottom">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-user-plus me-2 text-primary"></i>Enroll User (Student/Staff)</h5>
+            </div>
+            <div class="card-header bg-white pt-3 pb-0 border-bottom-0">
+                <ul class="nav nav-tabs border-bottom-0" id="enrollmentTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-bold text-primary px-4 border-0" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual-pane" type="button" role="tab" style="background: transparent;">
+                            <i class="fa-solid fa-user-plus me-2"></i>Manual Enroll
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold text-muted px-4 border-0" id="bulk-tab" data-bs-toggle="tab" data-bs-target="#bulk-pane" type="button" role="tab" style="background: transparent;">
+                            <i class="fa-solid fa-file-csv me-2"></i>Bulk Upload (CSV/Excel)
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body pt-0 d-flex flex-column">
+                <hr class="mt-0 mb-3 border-light">
+                <div class="tab-content flex-grow-1" id="enrollmentTabsContent">
+                    <!-- Manual Enroll Pane -->
+                    <div class="tab-pane fade show active h-100" id="manual-pane" role="tabpanel">
+                        <form method="post" action="{% url 'enroll_user' %}" enctype="multipart/form-data" class="h-100 d-flex flex-column justify-content-between">
+                            {% csrf_token %}
+                            <div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Select Role</label>
+                                        <select class="form-select" name="role" required>
+                                            <option value="Student">Student</option>
+                                            <option value="Staff">Staff</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Department (If Staff)</label>
+                                        <select class="form-select" name="department">
+                                            <option value="">-- Select --</option>
+                                            <option value="CSE">CSE</option>
+                                            <option value="IT">IT</option>
+                                            <option value="EEE">EEE</option>
+                                            <option value="ECE">ECE</option>
+                                            <option value="MCT">MCT</option>
+                                            <option value="MECH">MECH</option>
+                                            <option value="CIVIL">CIVIL</option>
+                                            <option value="AI&DS">AI&DS</option>
+                                            <option value="CYBER">CYBER</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Full Name</label>
+                                        <input type="text" class="form-control" name="name" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Roll Number / Staff ID</label>
+                                        <input type="text" class="form-control" name="roll_id" required>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">Face Image (For AI Detection)</label>
+                                    <input class="form-control" type="file" name="image" accept="image/*" required>
+                                    <div class="form-text">Upload a clear photo showing only the face.</div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 fw-bold py-2 rounded-pill mt-auto">Enroll User</button>
+                        </form>
+                    </div>
+
+                    <!-- Bulk Enroll Pane -->
+                    <div class="tab-pane fade h-100" id="bulk-pane" role="tabpanel">
+                        <form method="post" action="{% url 'bulk_enroll' %}" enctype="multipart/form-data" class="h-100 d-flex flex-column justify-content-between">
+                            {% csrf_token %}
+                            <div>
+                                <div class="alert alert-info rounded-3 small border-0 bg-info bg-opacity-10 text-info">
+                                    <i class="fa-solid fa-circle-info me-2"></i>Upload a CSV or Excel file to enroll multiple users at once.
+                                    The file must contain columns: <b>Role, Name, Roll No, Department</b>.
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">Upload CSV / Excel File</label>
+                                    <input class="form-control" type="file" name="bulk_file" accept=".csv, .xlsx, .xls" required>
+                                    <div class="form-text">Note: Face images must be manually added later to dataset folder.</div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100 fw-bold py-2 rounded-pill mt-auto">
+                                <i class="fa-solid fa-cloud-arrow-up me-2"></i>Upload & Bulk Enroll
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manual Attendance Edit Container -->
+    <div class="col-lg-6 d-flex align-items-stretch">
+        <div class="card border-0 shadow-sm w-100">
+            <div class="card-header bg-white d-flex align-items-center py-3">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-pen-to-square me-2 text-warning"></i>Manual Attendance Update</h5>
+            </div>
+            <div class="card-body d-flex flex-column">
+                <form method="post" action="{% url 'update_attendance' %}" class="flex-grow-1 d-flex flex-column justify-content-between">
+                    {% csrf_token %}
+                    <div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Select Role</label>
+                                <select class="form-select" name="role" required>
+                                    <option value="Student">Student</option>
+                                    <option value="Staff">Staff</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Roll Number / Staff ID</label>
+                                <input type="text" class="form-control" name="rollno" placeholder="e.g. 23BIT001" required>
+                            </div>
+                        </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Select Period</label>
+                            <select class="form-select" name="period" required>
+                                <option value="period1">Period 1</option>
+                                <option value="period2">Period 2</option>
+                                <option value="period3">Period 3</option>
+                                <option value="period4">Period 4</option>
+                                <option value="period5">Period 5</option>
+                                <option value="period6">Period 6</option>
+                                <option value="period7">Period 7</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Select Status</label>
+                            <select class="form-select" name="status" required>
+                                <option value="Present">Present</option>
+                                <option value="Absent">Absent</option>
+                                <option value="OD">On Duty (OD)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-warning w-100 fw-bold py-2 rounded-pill text-dark">Update Attendance</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Forms: OD and Staff Leave -->
+<div class="row g-4 mb-5">
+    <!-- Student OD Form -->
+    <div class="col-lg-6 d-flex align-items-stretch">
+        <div class="card border-0 shadow-sm w-100">
+            <div class="card-header bg-white d-flex align-items-center py-3">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-file-arrow-up me-2 text-info"></i>Upload Student OD Form</h5>
+            </div>
+            <div class="card-body d-flex flex-column">
+                <form method="post" action="{% url 'upload_od' %}" enctype="multipart/form-data" class="flex-grow-1 d-flex flex-column justify-content-between">
+                    {% csrf_token %}
+                    <div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Student Roll No</label>
+                                <input type="text" class="form-control" name="rollno" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Date of OD</label>
+                                <input type="date" class="form-control" name="date" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Document Proof</label>
+                            <input class="form-control" type="file" name="document" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Reason</label>
+                            <textarea class="form-control" name="reason" rows="2" placeholder="Enter reason for OD" required></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-info w-100 fw-bold py-2 rounded-pill text-white mt-auto">Upload & Approve OD</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Staff Leave Permission Form -->
+    <div class="col-lg-6 d-flex align-items-stretch">
+        <div class="card border-0 shadow-sm w-100">
+            <div class="card-header bg-white d-flex align-items-center py-3">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-person-walking-arrow-right me-2 text-danger"></i>Apply Leave Permission</h5>
+            </div>
+            <div class="card-body d-flex flex-column">
+                <form method="post" action="{% url 'upload_staff_leave' %}" enctype="multipart/form-data" class="flex-grow-1 d-flex flex-column justify-content-between">
+                    {% csrf_token %}
+                    <div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Date of Leave</label>
+                            <input type="date" class="form-control" name="date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Reason</label>
+                            <textarea class="form-control" name="reason" rows="2" placeholder="Why are you requesting leave?" required></textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Document Proof (Optional)</label>
+                            <input class="form-control" type="file" name="document">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100 fw-bold py-2 rounded-pill mt-auto">Submit Leave Request</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Class Attendance Overview -->
+<div class="card mb-5 border-0 shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2 py-3">
+        <h5 class="mb-0 fw-bold"><i class="fa-solid fa-users-viewfinder me-2 text-primary"></i>Today's Class Attendance</h5>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <form method="GET" class="d-flex align-items-center mb-0">
+                <input type="date" class="form-control form-control-sm me-2" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+                <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+            </form>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa-solid fa-download me-1"></i> Reports
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                    <li><h6 class="dropdown-header">Download Format</h6></li>
+                    <li><a class="dropdown-item" href="{% url 'export_attendance_pdf' %}?date={{ selected_date|date:'Y-m-d' }}"><i class="fa-solid fa-file-pdf text-danger me-2"></i>PDF Document</a></li>
+                    <li><a class="dropdown-item" href="{% url 'export_attendance_excel' %}?date={{ selected_date|date:'Y-m-d' }}"><i class="fa-solid fa-file-excel text-success me-2"></i>Excel Spreadsheet</a></li>
+                    <li><a class="dropdown-item" href="{% url 'export_attendance_word' %}?date={{ selected_date|date:'Y-m-d' }}"><i class="fa-solid fa-file-word text-primary me-2"></i>Word Document</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{% url 'export_attendance_csv' %}?date={{ selected_date|date:'Y-m-d' }}"><i class="fa-solid fa-file-csv text-secondary me-2"></i>CSV File</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="attendanceTable">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Student Details</th>
+                        <th class="text-center">P1</th>
+                        <th class="text-center">P2</th>
+                        <th class="text-center">P3</th>
+                        <th class="text-center">P4</th>
+                        <th class="text-center">P5</th>
+                        <th class="text-center">P6</th>
+                        <th class="text-center">P7</th>
+                        <th class="text-center">Status Hint</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceBody">
+                    {% for record in records %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if record.student.student_image %}
+                                    <img src="{{ record.student.student_image.url }}" class="avatar-img me-3" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
+                                {% else %}
+                                    <div class="avatar-img me-3 bg-light d-flex align-items-center justify-content-center text-primary fw-bold" style="width: 40px; height: 40px; border-radius: 50%;">
+                                        {{ record.student_name|make_list|first }}
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <div class="fw-bold text-dark">{{ record.student_name }}</div>
+                                    <div class="small text-muted">{{ record.student_rollno }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        {% for period in periods %}
+                            <td class="text-center">
+                                {% with status=record|get_period_status:period time=record|get_period_time:period %}
+                                    {% if status == 'Present' %}
+                                        <div class="d-flex flex-column align-items-center">
+                                            <i class="fa-solid fa-circle-check text-success fs-5" title="Present"></i>
+                                            {% if time %}
+                                                <small class="text-muted fw-bold mt-1" style="font-size: 0.65rem;">{{ time|time:"h:i A" }}</small>
+                                            {% endif %}
+                                        </div>
+                                    {% elif status == 'OD' %}
+                                        <div class="d-flex flex-column align-items-center">
+                                            <i class="fa-solid fa-circle-user text-info fs-5" title="On Duty"></i>
+                                        </div>
+                                    {% else %}
+                                        <div class="d-flex flex-column align-items-center">
+                                            <i class="fa-solid fa-circle-xmark text-danger fs-5" title="Absent"></i>
+                                        </div>
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                        {% endfor %}
+                        <td class="text-center">
+                            <span class="text-muted small">Use panel above to edit</span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">No attendance records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 15px;
+        transition: transform 0.2s ease-in-out;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    .avatar-img {
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Live Dashboard Auto-Refresh (Every 3 seconds)
+        setInterval(() => {
+            fetch(window.location.href)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    
+                    const newBody = doc.getElementById('attendanceBody');
+                    const oldBody = document.getElementById('attendanceBody');
+                    if (newBody && oldBody) {
+                        oldBody.innerHTML = newBody.innerHTML;
+                    }
+                })
+                .catch(err => console.log('Live update error:', err));
+        }, 3000);
+    });
+</script>
+
+{% endblock %}

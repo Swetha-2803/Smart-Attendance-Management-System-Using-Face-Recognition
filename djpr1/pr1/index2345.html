@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResumeIQ | Fresher Edition</title>
+<style>
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #f0f2f5; color: #1f2937; }
+    .container { display: flex; }
+    .hidden { display: none !important; }
+
+    /* SIDEBAR */
+    .sidebar { width: 260px; height: 100vh; background: #0f172a; color: white; padding: 25px; position: sticky; top: 0; display: flex; flex-direction: column; }
+    .sidebar h2 { color: #6366f1; margin-bottom: 40px; }
+    .sidebar div { padding: 12px; margin: 8px 0; cursor: pointer; border-radius: 8px; transition: 0.3s; opacity: 0.8; }
+    .sidebar .active { background: #6366f1; opacity: 1; font-weight: bold; }
+    .sidebar div:hover { background: rgba(255,255,255,0.1); }
+
+    /* MAIN CONTENT */
+    .main { flex: 1; padding: 30px; }
+    .page { display: none; animation: fadeIn 0.5s ease; }
+    .active-page { display: block; }
+
+    /* DASHBOARD ELEMENTS */
+    .hero-card { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; padding: 30px; border-radius: 15px; margin-bottom: 25px; }
+    .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 25px; }
+    
+    /* JOB CARDS */
+    .jobs-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .job-card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #e5e7eb; transition: 0.3s; }
+    .job-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+    .company-img { width: 50px; height: 50px; border-radius: 8px; margin-bottom: 10px; object-fit: contain; background: #f8fafc; padding: 5px; }
+    .package-tag { background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; }
+    .apply-btn { display: block; width: 100%; text-align: center; background: #111827; color: white; padding: 10px; border-radius: 6px; text-decoration: none; margin-top: 15px; font-size: 14px; }
+
+    /* ANALYZER SCORE CIRCLE */
+    .score-container { display: flex; flex-direction: column; align-items: center; margin-top: 20px; }
+    .circle-wrap { width: 120px; height: 120px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; position: relative; border: 8px solid #e5e7eb; }
+    .high-score { border-color: #10b981; color: #059669; }
+    .medium-score { border-color: #f59e0b; color: #d97706; }
+
+    /* ANALYSIS LIST */
+    .mistake-box { background: #fee2e2; border-left: 5px solid #ef4444; padding: 15px; margin: 10px 0; border-radius: 4px; }
+    .fix-box { background: #f0fdf4; border-left: 5px solid #22c55e; padding: 15px; margin: 10px 0; border-radius: 4px; }
+
+    .upload-zone { border: 2px dashed #6366f1; padding: 40px; text-align: center; border-radius: 12px; cursor: pointer; background: #f8fafc; margin-bottom: 20px; }
+    iframe { width: 100%; height: 400px; display: none; margin-top: 20px; border-radius: 8px; border: 1px solid #ddd; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div id="app-container" class="container">
+    <div class="sidebar">
+        <h2>ResumeIQ</h2>
+        <div id="nav-dashboard" class="active" onclick="switchPage('dashboard')">🏠 Dashboard</div>
+        <div id="nav-analyzer" onclick="switchPage('analyzer')">🔬 Analyzer</div>
+        <div onclick="location.reload()" style="margin-top:auto">🚪 Logout</div>
+    </div>
+
+    <div class="main">
+        
+        <div id="dashboard" class="page active-page">
+            <div class="hero-card">
+                <h1>Optimize Your Path to Success</h1>
+                <p>For freshers, a resume isn't just a list—it's your story. Focus on Projects, Skills, and Internships to stand out from 1000+ applicants.</p>
+            </div>
+
+            <div class="card">
+                <h3>Resume Best Practices for Freshers</h3>
+                <ul style="columns: 2; line-height: 1.8;">
+                    <li>✅ Keep it to <b>1 Page</b></li>
+                    <li>✅ Use <b>Action Verbs</b> (Developed, Led, Built)</li>
+                    <li>✅ Focus on <b>Black & White</b> Clean Design</li>
+                    <li>✅ Highlight <b>GitHub/Portfolio</b> links</li>
+                    <li>✅ Quantify results (e.g., "85% accuracy")</li>
+                    <li>✅ Avoid personal photos & hobbies</li>
+                </ul>
+            </div>
+
+            <h3>Top Hiring Companies for Freshers</h3>
+            <div class="jobs-container">
+                <div class="job-card">
+                    <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" class="company-img" alt="Google">
+                    <h4>Associate Software Engineer</h4>
+                    <span class="package-tag">₹18 - 35 LPA</span>
+                    <p style="font-size: 13px; margin: 10px 0;"><b>Req:</b> Data Structures, Algorithms, Java/Python.</p>
+                    <a href="#" class="apply-btn">View Requirements</a>
+                </div>
+                <div class="job-card">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/1024px-Microsoft_logo.svg.png" class="company-img" alt="Microsoft">
+                    <h4>Full Stack Developer Intern</h4>
+                    <span class="package-tag">₹12 - 24 LPA</span>
+                    <p style="font-size: 13px; margin: 10px 0;"><b>Req:</b> C#, React, SQL, Problem Solving.</p>
+                    <a href="#" class="apply-btn">View Requirements</a>
+                </div>
+                <div class="job-card">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c7/Zoho_logo.png" class="company-img" alt="Zoho">
+                    <h4>Software Developer</h4>
+                    <span class="package-tag">₹6 - 12 LPA</span>
+                    <p style="font-size: 13px; margin: 10px 0;"><b>Req:</b> Logical Reasoning, C/C++, Java.</p>
+                    <a href="#" class="apply-btn">View Requirements</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="analyzer" class="page">
+            <div class="card">
+                <h2>Resume Analysis Lab</h2>
+                <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+                    <p>Click to upload your Fresher Resume (PDF)</p>
+                    <input type="file" id="fileInput" hidden onchange="processFile()">
+                </div>
+                <iframe id="viewer"></iframe>
+                
+                <div id="analysisResult" class="hidden">
+                    <div class="score-container">
+                        <div id="scoreCircle" class="circle-wrap">0%</div>
+                        <h3 id="scoreStatus">Analyzing...</h3>
+                    </div>
+
+                    <div id="mistakesSection">
+                        <h4>Critical Improvements Needed:</h4>
+                        <div id="mistakesList"></div>
+                    </div>
+
+                    <div id="positiveSection" style="margin-top: 20px;">
+                        <h4>What you did well:</h4>
+                        <div id="positivesList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function switchPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+        document.getElementById(pageId).classList.add('active-page');
+        document.querySelectorAll('.sidebar div').forEach(d => d.classList.remove('active'));
+        document.getElementById('nav-' + pageId).classList.add('active');
+    }
+
+    function processFile() {
+        const viewer = document.getElementById('viewer');
+        const file = document.getElementById('fileInput').files[0];
+        if(file) {
+            viewer.src = URL.createObjectURL(file);
+            viewer.style.display = 'block';
+            runAnalysis();
+        }
+    }
+
+    function runAnalysis() {
+        const resultDiv = document.getElementById('analysisResult');
+        resultDiv.classList.remove('hidden');
+        
+        // Mock Score (Setting it to 92% to show the "Slight Correction" logic)
+        let score = 92; 
+        const circle = document.getElementById('scoreCircle');
+        const status = document.getElementById('scoreStatus');
+        
+        circle.innerText = score + "%";
+        circle.className = "circle-wrap high-score";
+        status.innerText = "Excellent Profile! (Slight Tweaks Recommended)";
+
+        // Detail Mistakes/Corrections
+        const mList = document.getElementById('mistakesList');
+        mList.innerHTML = `
+            <div class="mistake-box">
+                <b>🚩 Missing Metrics:</b> Unga projects-la accuracy levels (e.g., 90% accuracy in Face Recognition) illa. Adha add pannunga.
+            </div>
+            <div class="mistake-box">
+                <b>🚩 Skill Hierarchy:</b> Skills-a "Proficient" and "Familiar" nu categorize panna innum professional-ah irukum.
+            </div>
+            <div class="mistake-box">
+                <b>🚩 Link Verification:</b> LinkedIn and GitHub links clickable-ah irukannu check pannunga (Hyperlinks are mandatory).
+            </div>
+        `;
+
+        const pList = document.getElementById('positivesList');
+        pList.innerHTML = `
+            <div class="fix-box">✅ <b>Internship Depth:</b> 3 distinct internships (Infosys, CodeAlpha, Synovers) is a huge plus for a fresher.</div>
+            <div class="fix-box">✅ <b>Tech Stack:</b> Python + Django + MySQL combo is highly trending for web roles.</div>
+            <div class="fix-box">✅ <b>Format:</b> Single column layout is ATS friendly.</div>
+        `;
+    }
+</script>
+
+</body>
+</html>
